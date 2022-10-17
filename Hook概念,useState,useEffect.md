@@ -144,3 +144,92 @@ console.log('副作用执行了');
 
 
 
+#### 9.useState --- 回调函数的参数
+
+使用场景： 只会在组件初始化渲染中起作用，后续渲染时会被忽略，如果初始state需要通过计算才能获得，则可以传入一个函数，在函数中计算并返回初始的state,此函数只在初始渲染时被调用
+
+**语法**
+
+```javascript
+const [name,setName] = useState( () => { //编写计算逻辑  return '计算之后的初始值'})
+```
+
+语法规则：
+
++ 回调函数return出去的值将作为name的初始值
+
++ 回调函数中的逻辑只会在组件初始化的时候执行一次
+
+  
+
+语法选择
+
++ 1.如果就是初始化一个普通的数据，直接使用useState(普通数据)即可
++ 2.如果要初始化的数据无法得到需要通过计算才能获取到，使用useState( () => {} )
+
+#### 10.useEffect - 清理副作用
+
+使用场景：在组件被销毁时，如果有些副作用操作需要被清理，就可以使用此语法，比如常见的定时器
+
+语法及规则
+
+```
+useEffect(() => {
+	console.log('副作用函数执行了');
+	return () => {
+	console.log('清理副作用的函数执行了');
+	}
+})
+```
+
+#### 11.定时器小案列
+
+添加副作用函数前：组件虽然已经不显示了，但是定时器依旧运行
+
+```javascript
+function Foo() {
+  useEffect(() => {
+    let timer = setInterval(() => {
+        console.log('副作用函数执行了');
+      },1000);
+      return () => {
+        clearInterval(timer);
+      }
+  },[])
+  return <div>Foo</div>
+}
+
+function App() {
+  const [flag, setFlag] = useState(true);
+  return (
+    <div >
+      { flag ? <Foo></Foo> : null}
+      <button onClick={ () => setFlag(!flag)}>switch</button>
+    </div>
+  )
+}
+```
+
+#### 12.发送网络请求
+
+useEffect
+
+1. 不加依赖项  -- 初始化 + 重新渲染
+
+2. 加 [ ] - 初始化执行一次
+
+3. 加特定的依赖项  [count,name]  -- 首次执行 + 任意一个变化执行
+
+#### 13.useRef
+
+使用场景:
+
+在函数组件中获取真实的DOM对象或者是组件对象
+
+使用步骤：
+
++ 1.导入useRef函数
++ 2.执行useRef函数并传入null，返回值是一个对象，内部有一个current属性存放拿到的dom对象(组件实例)
++ 3.通过ref 绑定要获取的元素或者组件
+
+> useEffect回调，是在dom渲染之后执行
